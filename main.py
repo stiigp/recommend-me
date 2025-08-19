@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from view.user_router import user_router
+from view.genre_router import genre_router
 from sqlalchemy.exc import SQLAlchemyError
 
 app = FastAPI()
@@ -9,10 +10,11 @@ app = FastAPI()
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     return JSONResponse(
         status_code=500,
-        content={"detail": f"Erro interno no banco de dados: {exc}"}
+        content={"detail": f"internal database error: {exc}"}
     )
 
 app.include_router(user_router)
+app.include_router(genre_router)
 
 @app.get('/')
 def root():
