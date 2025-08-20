@@ -28,7 +28,7 @@ def list_reviews():
     except:
         raise
 
-@review_router.get('/{id}')
+@review_router.get('/users/{id}')
 def list_reviews_user(id: int):
     try:
         with get_session() as session:

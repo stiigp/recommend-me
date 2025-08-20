@@ -44,7 +44,7 @@ class Review:
                 select(ReviewModel)
                 .options(
                     selectinload(ReviewModel.user).options(
-                        load_only(UserModel.id, UserModel.username)
+                        load_only(UserModel.username)
                     ),
                     selectinload(ReviewModel.movie).options(
                         load_only(MovieModel.id, MovieModel.title)
@@ -55,7 +55,7 @@ class Review:
                         ReviewModel.description
                     )
                 )
-            ).where(ReviewModel.id == self.id)
+            ).where(ReviewModel.user_id == self.user.id)
         else:
             stmt = (
                 select(ReviewModel)
@@ -75,6 +75,7 @@ class Review:
             )
 
         try:
+            session.expunge_all()
             reviews = session.execute(stmt).scalars().all()
 
             return reviews
