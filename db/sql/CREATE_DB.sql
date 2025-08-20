@@ -4,7 +4,7 @@ CREATE TABLE users (
     username VARCHAR(30) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(100) NOT NULL,
-    create_time TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Relação de seguir (seguidores/seguidos)
@@ -37,7 +37,7 @@ CREATE TABLE reviews (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     movie_id BIGINT NOT NULL,
-    rating INT NOT NULL CHECK (rating >= 0 AND rating <= 10),
+    rating NUMERIC(2,1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
     description TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

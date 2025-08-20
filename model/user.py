@@ -41,9 +41,9 @@ class User:
 
     def list(self, session: Session):
         try:
-            all_users = session.execute(select(UserModel.id, UserModel.username, UserModel.email, UserModel.create_time)).all()
+            all_users = session.execute(select(UserModel.id, UserModel.username, UserModel.email, UserModel.created_at)).all()
 
-            res = [{"id": user.id, "username": user.username, "email": user.email, "create_time": user.create_time} for user in all_users]
+            res = [{"id": user.id, "username": user.username, "email": user.email, "created_at": user.created_at} for user in all_users]
 
             return res
         except:
@@ -85,7 +85,6 @@ class User:
                 args['username'] = self.username
             if self.email != None:
                 args['email'] = self.email
-                logger.info(args)
             if self.password != None:
                 hasher = Hasher(input=self.password)
                 args['password_hash'] = hasher.encrypt()

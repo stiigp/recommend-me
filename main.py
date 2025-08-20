@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from view.user_router import user_router
 from view.genre_router import genre_router
 from view.movie_router import movie_router
+from view.review_router import review_router
 from sqlalchemy.exc import SQLAlchemyError
 
 app = FastAPI()
@@ -17,6 +18,7 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
 app.include_router(user_router)
 app.include_router(genre_router)
 app.include_router(movie_router)
+app.include_router(review_router)
 
 @app.get('/')
 def root():

@@ -5,7 +5,7 @@ from db.db import get_session
 
 movie_router = APIRouter(
     prefix='/movies',
-    tags=['users']
+    tags=['movies']
 )
 
 @movie_router.post('/')
