@@ -46,18 +46,7 @@ class MovieController:
         try:
             all_movies = movie.list(session=self.session)
 
-            all_movies = [
-                {
-                    'id': iMovie['id'],
-                    'title': iMovie['title'],
-                    'year': iMovie['year'],
-                    'genre': self.session.get(GenreModel, iMovie['main_genre'])
-                }
-                for iMovie in all_movies
-            ]
-
             return all_movies
-
         except:
             raise
     

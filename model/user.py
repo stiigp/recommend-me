@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, delete, update
 from db.entities.user_model import UserModel
@@ -41,11 +41,16 @@ class User:
 
     def list(self, session: Session):
         try:
-            all_users = session.execute(select(UserModel.id, UserModel.username, UserModel.email, UserModel.created_at)).all()
+            all_users = session.execute(select(UserModel).options(
+                load_only(
+                    UserModel.id,
+                    UserModel.username,
+                    UserModel.email,
+                    UserModel.created_at
+                )
+            )).scalars().all()
 
-            res = [{"id": user.id, "username": user.username, "email": user.email, "created_at": user.created_at} for user in all_users]
-
-            return res
+            return all_users
         except:
             raise
 

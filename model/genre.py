@@ -27,11 +27,9 @@ class Genre:
 
     def list(self, session: Session):
         try:
-            all_genres = session.execute(select(GenreModel.id, GenreModel.name)).all()
+            all_genres = session.execute(select(GenreModel)).scalars().all()
 
-            res = [{'id': genre.id, 'name': genre.name} for genre in all_genres]
-
-            return res
+            return all_genres
         except:
             raise
     

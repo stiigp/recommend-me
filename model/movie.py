@@ -1,6 +1,6 @@
 from db.entities.movie_model import MovieModel
 from model.genre import Genre
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload, load_only
 from sqlalchemy import select, delete, update
 from fastapi import HTTPException
 
@@ -31,19 +31,16 @@ class Movie:
     
     def list(self, session: Session):
         try:
-            all_movies = session.execute(select(MovieModel.id, MovieModel.title, MovieModel.year, MovieModel.main_genre))
+            all_movies = session.execute(select(MovieModel).options(
+                selectinload(MovieModel.genre),
+                load_only(
+                    MovieModel.id,
+                    MovieModel.title,
+                    MovieModel.year
+                )
+            )).scalars().all()
 
-            res = [
-                {
-                    'id': movie.id,
-                    'title': movie.title,
-                    'year': movie.year,
-                    'main_genre': movie.main_genre
-                }
-                for movie in all_movies
-            ]
-
-            return res
+            return all_movies
         except:
             raise
     
