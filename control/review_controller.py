@@ -1,6 +1,8 @@
 import logging
 
 from model.review import Review
+from model.movie import Movie
+from model.user import User
 from db.entities.movie_model import MovieModel
 from db.entities.user_model import UserModel
 from fastapi import HTTPException
@@ -16,27 +18,15 @@ class ReviewController:
 
     def save(self):
         try:
-            movie = self.session.get(MovieModel, self.payload.movie_id)
-
-            if movie == None:
-                raise HTTPException(
-                    status_code=404,
-                    detail='movie corresponding to the review doesnt exist'
-                )
-            
-            user = self.session.get(UserModel, self.payload.user_id)
-
-            if user == None:
-                raise HTTPException(
-                    status_code=404,
-                    detail='user corresponding to the review doesnt exist'
-                )
-            
             review = Review(
                 rating=self.payload.rating,
                 description=self.payload.description,
-                movie = movie,
-                user = user
+                movie = Movie(
+                    id=self.payload.movie_id
+                ),
+                user = User(
+                    id=self.payload.user_id
+                )
             )
 
             retorno = review.save(session=self.session)

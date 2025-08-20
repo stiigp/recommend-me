@@ -1,6 +1,7 @@
 import logging
 
 from model.movie import Movie
+from model.genre import Genre
 from db.entities.genre_model import GenreModel
 from fastapi import HTTPException
 from schemas.movie_dto import MovieDTO
@@ -14,27 +15,16 @@ class MovieController:
         self.session = session
 
     def save(self):
-        try:
-            genre = self.session.get(GenreModel, self.payload.genre_id)
-
-            if genre == None:
-                raise HTTPException(
-                    status_code=404,
-                    detail='genre corresponding to the movie doenst exist'
-                )
-
+        try:            
             movie = Movie(
                 title=self.payload.title,
                 year=self.payload.year,
-                genre=genre
+                genre=Genre(
+                    id=self.payload.genre_id
+                )
             )
 
             retorno = movie.save(session=self.session)
-
-            retorno.main_genre = {
-                'id': genre.id,
-                'name': genre.name
-            }
 
             return {'message': 'movie created succesfully', 'movie': retorno}
         except:

@@ -7,6 +7,7 @@ from db.entities.review_model import ReviewModel
 from db.entities.user_model import UserModel
 from db.entities.movie_model import MovieModel
 from sqlalchemy import select, update, delete
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
 logger = logging.getLogger("uvicorn.error")
@@ -21,8 +22,8 @@ class Review:
     
     def save(self, session: Session):
         review_model = ReviewModel(
-            user=self.user,
-            movie=self.movie,
+            user_id=self.user.id,
+            movie_id=self.movie.id,
             rating=self.rating,
             description=self.description
         )
@@ -30,13 +31,23 @@ class Review:
         try:
             session.add(review_model)
             session.commit()
-            session.refresh(review_model)
+            session.refresh(review_model, ['user', 'movie'])
+
+            del review_model.user.password_hash
 
             return review_model
-        except:
+        except Exception as e:
             session.rollback()
 
-            raise
+            if isinstance(e, IntegrityError):
+                err = HTTPException(
+                    status_code=404,
+                    detail=f'integrity error (probably user or movie doesnt exist): {str(e.orig).lower()}'
+                )
+
+                raise err
+
+            raise e
 
     def list(self, session: Session):
         if self.user != None:
@@ -83,19 +94,17 @@ class Review:
             raise
 
     def delete(self, session: Session):
-        stmt = select(ReviewModel).where(ReviewModel.id == self.id)
         try:
-            review = session.execute(stmt)
+            stmt = delete(ReviewModel).where(ReviewModel.id == self.id).returning(ReviewModel.id)
 
-            if review == None:
+            res = session.execute(stmt).scalar()
+
+            if res is None:
                 raise HTTPException(
                     status_code=404,
                     detail="trying to delete non-existent review"
                 )
             
-            stmt = delete(ReviewModel).where(ReviewModel.id == self.id)
-
-            session.execute(stmt)
             session.commit()
 
             return

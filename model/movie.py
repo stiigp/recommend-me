@@ -2,6 +2,7 @@ from db.entities.movie_model import MovieModel
 from model.genre import Genre
 from sqlalchemy.orm import Session, selectinload, load_only
 from sqlalchemy import select, delete, update
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
 class Movie:
@@ -15,19 +16,25 @@ class Movie:
         movie_model = MovieModel(
             title=self.title,
             year=self.year,
-            genre=self.genre
+            main_genre=self.genre.id
         )
 
         try:
             session.add(movie_model)
             session.commit()
-            session.refresh(movie_model)
+            session.refresh(movie_model, ["genre"])
 
             return movie_model
-        except:
+        except Exception as e:
             session.rollback()
+            if isinstance(e, IntegrityError):
+                err = HTTPException(
+                    status_code=404,
+                    detail=f"integrity error (probably genre doenst exist): {str(e.orig).lower()}"
+                )
+                raise err
 
-            raise
+            raise e
     
     def list(self, session: Session):
         try:
@@ -46,17 +53,16 @@ class Movie:
     
     def delete(self, session: Session):
         try:
-            movie = session.execute(select(MovieModel).where(MovieModel.id == self.id)).scalar()
+            stmt = delete(MovieModel).where(MovieModel.id == self.id).returning(MovieModel.id)
 
-            if movie == None:
+            movie = session.execute(stmt).scalar()
+
+            if movie is None:
                 raise HTTPException(
                     status_code=404,
                     detail="trying to delete non-existent movie"
                 )
-            
-            stmt = delete(MovieModel).where(MovieModel.id == self.id)
 
-            session.execute(stmt)
             session.commit()
 
             return
