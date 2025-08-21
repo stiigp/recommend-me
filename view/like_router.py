@@ -39,7 +39,7 @@ def list_likes_user(id: int):
         raise
 
 @like_router.get('/reviews/{id}')
-def list_likes_user(id: int):
+def list_likes_review(id: int):
     try:
         with get_session() as session:
             lk_ctrl = LikeController(payload={'review_id': id}, session=session)
