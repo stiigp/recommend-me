@@ -41,8 +41,8 @@ class GenreController:
     
     def update(self):
         genre = Genre(
-            id=self.payload['id'],
-            name = self.payload['genre'].name
+            id=self.payload.id,
+            name = self.payload.name
         )
 
         try:

@@ -40,9 +40,10 @@ def delete_user(id: int):
 
 @movie_router.patch('/{id}')
 def update_movie(id: int, movie: MovieDTO):
+    movie.id = id
     try:
         with get_session() as session:
-            mv_ctrl = MovieController(payload={'id': id, 'movie': movie}, session=session)
+            mv_ctrl = MovieController(payload=movie, session=session)
 
             return mv_ctrl.update()
     except:

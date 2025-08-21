@@ -44,10 +44,10 @@ class UserController:
 
     def update(self):
         user = User(
-            id=self.payload['id'],
-            username = self.payload['user'].username,
-            password=self.payload['user'].password,
-            email=self.payload['user'].email
+            id=self.payload.id,
+            username = self.payload.username,
+            password=self.payload.password,
+            email=self.payload.email
         )
 
         try:

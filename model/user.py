@@ -99,7 +99,8 @@ class User:
             session.execute(stmt)
             session.commit()
 
-            user = session.execute(select(UserModel).where(UserModel.id == self.id)).scalar()
+            session.refresh(user)
+            
             del user.password_hash
 
             return user

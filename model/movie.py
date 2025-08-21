@@ -72,7 +72,7 @@ class Movie:
 
     def update(self, session: Session):
         try:
-            movie = session.execute(select(MovieModel).where(MovieModel.id == self.id)).scalar()
+            movie = session.get(MovieModel, self.id)
 
             if movie == None:
                 raise HTTPException(
@@ -86,7 +86,7 @@ class Movie:
                 args['title'] = self.title
             if self.year != None:
                 args['year'] = self.year
-            if self.genre != None:
+            if self.genre.id != None:
                 args['main_genre'] = self.genre.id
             
             stmt = update(MovieModel).where(MovieModel.id == self.id).values(**args)
@@ -94,11 +94,19 @@ class Movie:
             session.execute(stmt)
             session.commit()
 
-            movie = session.execute(select(MovieModel).where(MovieModel.id == self.id)).scalar()
+            session.refresh(movie, ['genre'])
 
             return movie
         
-        except:
+        except Exception as e:
             session.rollback()
 
-            raise
+            if isinstance(e, IntegrityError):
+                err = HTTPException(
+                    status_code=404,
+                    detail=f'integrity error (probably genre youre trying to alter to doesnt exist): {str(e.orig).lower()}'
+                )
+
+                raise err
+
+            raise e

@@ -56,7 +56,7 @@ class Genre:
 
     def update(self, session: Session):
         try:
-            genre = session.execute(select(GenreModel).where(GenreModel.id == self.id)).scalar()
+            genre = session.get(GenreModel, self.id)
 
             if genre == None:
                 raise HTTPException(

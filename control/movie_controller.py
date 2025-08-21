@@ -53,40 +53,17 @@ class MovieController:
             raise
 
     def update(self):
-        try:            
-            genre = None
-            if self.payload['movie'].genre_id != None:
-                genre = self.session.get(GenreModel, self.payload['movie'].genre_id)
-
-                if genre == None:
-                    raise HTTPException(
-                        status_code=404,
-                        detail='genre corresponding to the movie doenst exist'
-                    )
-
-            if genre == None:
-                movie = Movie(
-                    id=self.payload['id'],
-                    title=self.payload['movie'].title,
-                    year=self.payload['movie'].year
+        try:                        
+            movie = Movie(
+                id=self.payload.id,
+                title=self.payload.title,
+                year=self.payload.year,
+                genre=Genre(
+                    id=self.payload.genre_id
                 )
-            else:
-                movie = Movie(
-                    id=self.payload['id'],
-                    title=self.payload['movie'].title,
-                    year=self.payload['movie'].year,
-                    genre=genre
-                )
+            )
 
             res = movie.update(self.session)
-
-            if genre == None:
-                genre = self.session.get(GenreModel, res.main_genre)
-
-            res.main_genre = {
-                'id': genre.id,
-                'name': genre.name
-            }
 
             return {'message': f'movie updated successfully', 'movie': res}
         except:

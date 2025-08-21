@@ -40,9 +40,10 @@ def delete_genre(id: int):
 
 @genre_router.patch('/{id}')
 def update_genre(id: int, genre: GenreDTO):
+    genre.id = id
     try:
         with get_session() as session:
-            genre_ctrl = GenreController(payload={'id': id, 'genre': genre}, session=session)
+            genre_ctrl = GenreController(payload=genre, session=session)
 
             return genre_ctrl.update()
     except:

@@ -40,9 +40,10 @@ def delete_user(id: int):
 
 @user_router.patch('/{id}')
 def update_user(id: int, user: UserDTO):
+    user.id = id
     try:
         with get_session() as session:
-            usr_ctrl = UserController(payload={'id': id, 'user': user}, session=session)
+            usr_ctrl = UserController(payload=user, session=session)
             
             return usr_ctrl.update()
     except:
