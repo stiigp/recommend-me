@@ -37,17 +37,10 @@ class ReviewController:
 
     def select(self):
         try:
-            if isinstance(self.payload, int):
-                user = self.session.get(UserModel, self.payload)
-
-                if user == None:
-                    raise HTTPException(
-                        status_code=404,
-                        detail='user doesnt exist!'
-                    )
-                
-                review = Review(user=user)
-
+            if self.payload != None:
+                review = Review(user=User(
+                    id=self.payload.user_id
+                ))
             else:
                 review = Review()
             
@@ -72,9 +65,9 @@ class ReviewController:
     def update(self):
         try:
             review = Review(
-                id=self.payload['id'],
-                rating=self.payload['review'].rating,
-                description=self.payload['review'].description
+                id=self.payload.id,
+                rating=self.payload.rating,
+                description=self.payload.description
             )
 
             res = review.update(self.session)

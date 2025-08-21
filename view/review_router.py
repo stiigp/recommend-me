@@ -32,7 +32,9 @@ def list_reviews():
 def list_reviews_user(id: int):
     try:
         with get_session() as session:
-            rv_ctrl = ReviewController(payload=id, session=session)
+            rv_ctrl = ReviewController(payload=ReviewDTO(
+                user_id=id
+            ), session=session)
 
             return rv_ctrl.select()
     except:
@@ -50,9 +52,10 @@ def delete_review(id: int):
 
 @review_router.patch('/{id}')
 def update_user(id: int, review: ReviewDTO):
+    review.id = id
     try:
         with get_session() as session:
-            rv_ctrl = ReviewController(payload={'id': id, 'review': review}, session=session)
+            rv_ctrl = ReviewController(payload=review, session=session)
 
             return rv_ctrl.update()
     except:

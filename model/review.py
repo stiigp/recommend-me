@@ -51,6 +51,16 @@ class Review:
 
     def list(self, session: Session):
         if self.user != None:
+            user_db = session.get(UserModel, self.user.id)
+
+            if user_db is None:
+                err = HTTPException(
+                    status_code=404,
+                    detail=f'user doesnt exist'
+                )
+
+                raise err
+
             stmt = (
                 select(ReviewModel)
                 .options(
@@ -114,9 +124,8 @@ class Review:
             raise
 
     def update(self, session: Session):
-        stmt = select(ReviewModel).where(ReviewModel.id == self.id)
         try:
-            review = session.execute(stmt)
+            review = session.get(ReviewModel, self.id)
 
             if review == None:
                 raise HTTPException(
