@@ -8,9 +8,8 @@ from datetime import datetime
 class LikeModel(Base):
     __tablename__ = 'likes'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    review_id: Mapped[int] = mapped_column(ForeignKey('reviews.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete="CASCADE"), primary_key=True)
+    review_id: Mapped[int] = mapped_column(ForeignKey('reviews.id', ondelete="CASCADE"), primary_key=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     user: Mapped["UserModel"] = relationship()

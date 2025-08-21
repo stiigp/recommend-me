@@ -55,13 +55,18 @@ class LikeController:
 
     def remove(self):
         like = Like(
-            id=self.payload
+            user=User(
+                id=self.payload.user_id
+            ),
+            review=Review(
+                id=self.payload.review_id
+            )
         )
 
         try:
-            like.delete(self.session)
+            res = like.delete(self.session)
 
-            return {'message': f'like deleted successfully', 'id': self.payload}
+            return {'message': f'like deleted successfully', 'like': res}
         except:
             raise
 

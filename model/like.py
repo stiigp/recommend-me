@@ -2,13 +2,12 @@ from db.entities.like_model import LikeModel
 from model.review import Review
 from model.user import User
 from sqlalchemy.orm import Session, selectinload, load_only
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, and_
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
 class Like:
-    def __init__(self, id: int=0, user:User=None, review:Review=None):
-        self.id = id
+    def __init__(self, user:User=None, review:Review=None):
         self.user = user
         self.review = review
 
@@ -59,9 +58,14 @@ class Like:
     
     def delete(self, session: Session):
         try:
-            stmt = delete(LikeModel).where(LikeModel.id == self.id).returning(LikeModel.id)
+            stmt = delete(LikeModel).where(
+                and_(
+                    LikeModel.user_id == self.user.id,
+                    LikeModel.review_id == self.review.id
+                )
+            ).options().returning(LikeModel.user_id, LikeModel.review_id)
 
-            result = session.execute(stmt).scalar()
+            result = session.execute(stmt).mappings().first()
 
             if result is None:
                 raise HTTPException(
@@ -72,7 +76,7 @@ class Like:
             session.commit()
 
             return result
-            
+
         except:
             session.rollback()
 

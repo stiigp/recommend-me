@@ -48,11 +48,16 @@ def list_likes_review(id: int):
     except:
         raise
 
-@like_router.delete('/{id}')
-def delete_like(id: int):
+@like_router.delete('/{userId}/{reviewId}')
+def delete_like(userId: int, reviewId: int):
+    like = LikeDTO(
+        user_id=userId,
+        review_id=reviewId
+    )
+    
     try:
         with get_session() as session:
-            lk_ctrl = LikeController(payload=id, session=session)
+            lk_ctrl = LikeController(payload=like, session=session)
 
             return lk_ctrl.remove()
     except:

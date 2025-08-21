@@ -47,11 +47,10 @@ CREATE TABLE reviews (
 
 -- Likes em reviews
 CREATE TABLE likes (
-    id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     review_id BIGINT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, review_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE,
-    UNIQUE (user_id, review_id) -- evita like duplicado
+    FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
 );
